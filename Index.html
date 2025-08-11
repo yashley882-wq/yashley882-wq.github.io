@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Admit Card Generator</title>
+    <style>
+        /* Kalpurush ফন্ট যুক্ত করা */
+        @import url('https://fonts.googleapis.com/css2?family=Kalpurush:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Times New Roman', serif; /* ডিফল্ট ফন্ট */
+            background-color: #d3d3d3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 0;
+        }
+        .input-form {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            width: 800px;
+        }
+        .input-form h2 { text-align: center; margin-top: 0; font-family: 'Kalpurush', sans-serif; }
+        .input-form input, .input-form select {
+            width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc;
+            border-radius: 4px; box-sizing: border-box; font-family: 'Kalpurush', sans-serif; font-size: 16px;
+        }
+        .input-form button {
+            width: 100%; padding: 12px; background-color: #007bff; color: white; border: none;
+            border-radius: 4px; font-size: 18px; cursor: pointer; font-family: 'Kalpurush', sans-serif;
+        }
+        
+        #admit-card-wrapper {
+            position: relative;
+            width: 893px;
+            height: 1262px;
+            background-image: url('https://i.ibb.co/8JzwH01/Admit-Card.png');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+        }
+        
+        .abs {
+            position: absolute;
+            font-family: 'Times New Roman', serif;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+        
+        .kalpurush-font {
+            font-family: 'Kalpurush', sans-serif;
+        }
+
+        /* --- Precise positioning (Final adjustments made) --- */
+        #reg-no-val { top: 132px; left: 198px; width: 200px; } /* Final adjustment */
+        #session-val { top: 177px; left: 198px; width: 200px; }
+        #exam-no-val { top: 132px; left: 695px; width: 150px; }
+
+        /* Specific font sizes for header numbers */
+        #reg-no-val, #session-val, #exam-no-val {
+            font-size: 15px;
+        }
+
+        #name-bn-val { top: 316px; left: 268px; width: 400px; }
+        #name-en-val { top: 347px; left: 268px; width: 400px; text-transform: uppercase; }
+        #mother-val { top: 379px; left: 268px; width: 400px; }
+        #father-val { top: 410px; left: 268px; width: 400px; }
+        #hall-val { top: 442px; left: 268px; width: 400px; }
+        
+        #exam-name-val { top: 582px; left: 271px; width: 400px; }
+        #exam-date-val { top: 631px; left: 271px; width: 400px; }
+        
+        #photo-val {
+            top: 283px;
+            right: 95px;
+            width: 100px;
+            height: 125px;
+            overflow: hidden;
+        }
+        #photo-val img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="input-form">
+        <h2>প্রবেশপত্রের তথ্য দিন</h2>
+        <input type="text" id="input-reg" placeholder="নিবন্ধন সংখ্যা">
+        <input type="text" id="input-session" placeholder="শিক্ষাবর্ষ">
+        <input type="text" id="input-exam-no" placeholder="পরীক্ষার্থী নম্বর">
+        <input type="text" id="input-name-bn" placeholder="বাংলায় নাম">
+        <input type="text" id="input-name-en" placeholder="ইংরেজীতে নাম">
+        <input type="text" id="input-mother" placeholder="মাতার নাম">
+        <input type="text" id="input-father" placeholder="পিতার নাম">
+        <input type="text" id="input-hall" placeholder="হলের নাম">
+        <input type="text" id="input-exam-name" placeholder="পরীক্ষার নাম">
+        <input type="date" id="input-exam-date">
+        <label for="input-photo" style="display:block; margin-top:10px;">ছবি আপলোড করুন:</label>
+        <input type="file" id="input-photo" accept="image/*">
+        <br><br>
+        <button id="generate-btn">প্রবেশপত্র তৈরি করুন</button>
+    </div>
+
+    <div id="admit-card-wrapper">
+        <span id="reg-no-val" class="abs"></span>
+        <span id="session-val" class="abs"></span>
+        <span id="exam-no-val" class="abs"></span>
+        <span id="name-bn-val" class="abs kalpurush-font"></span>
+        <span id="name-en-val" class="abs"></span>
+        <span id="mother-val" class="abs"></span>
+        <span id="father-val" class="abs"></span>
+        <span id="hall-val" class="abs"></span>
+        <span id="exam-name-val" class="abs"></span>
+        <span id="exam-date-val" class="abs"></span>
+        <div id="photo-val" class="abs">
+            <img id="display-photo" src="" alt="">
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        document.getElementById('input-photo').addEventListener('change', function(event) {
+            if (event.target.files && event.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) { document.getElementById('display-photo').src = e.target.result; }
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        });
+
+        document.getElementById('generate-btn').addEventListener('click', function() {
+            const inputs = {
+                reg: document.getElementById('input-reg').value, session: document.getElementById('input-session').value, examNo: document.getElementById('input-exam-no').value,
+                nameBn: document.getElementById('input-name-bn').value, nameEn: document.getElementById('input-name-en').value, mother: document.getElementById('input-mother').value,
+                father: document.getElementById('input-father').value, hall: document.getElementById('input-hall').value,
+                examName: document.getElementById('input-exam-name').value, examDate: document.getElementById('input-exam-date').value
+            };
+            document.getElementById('reg-no-val').innerText = inputs.reg; document.getElementById('session-val').innerText = inputs.session;
+            document.getElementById('exam-no-val').innerText = inputs.examNo; document.getElementById('name-bn-val').innerText = inputs.nameBn;
+            document.getElementById('name-en-val').innerText = inputs.nameEn; document.getElementById('mother-val').innerText = inputs.mother;
+            document.getElementById('father-val').innerText = inputs.father; document.getElementById('hall-val').innerText = inputs.hall;
+            document.getElementById('exam-name-val').innerText = inputs.examName;
+            
+            if (inputs.examDate) {
+                const dateParts = inputs.examDate.split('-');
+                const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+                document.getElementById('exam-date-val').innerText = formattedDate;
+            } else {
+                document.getElementById('exam-date-val').innerText = '';
+            }
+            
+            const element = document.getElementById('admit-card-wrapper');
+            const opt = {
+              margin:       0,
+              filename:     'Admit_Card.pdf',
+              image:        { type: 'jpeg', quality: 1.0 },
+              html2canvas:  { scale: 3, useCORS: true },
+              jsPDF:        { unit: 'px', format: [893, 1262], orientation: 'portrait' }
+            };
+            
+            html2pdf().set(opt).from(element).save();
+        });
+    </script>
+</body>
+</html>
